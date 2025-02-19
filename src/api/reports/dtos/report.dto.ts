@@ -26,6 +26,9 @@ export class ReportDto {
 	@Expose()
 	price: number;
 
+	@Expose()
+	approved: number;
+
 	@Transform(({ obj }: { obj: Report }) => obj.user.id)
 	@Expose()
 	userId: number;
