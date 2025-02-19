@@ -9,7 +9,7 @@ import { Report } from "./report.entity";
 export class ReportsService {
 	constructor(@InjectRepository(Report) private repo: Repository<Report>) {}
 
-	create(reportDto: CreateReportDto, user: User) {
+	createReport(reportDto: CreateReportDto, user: User) {
 		const report = this.repo.create(reportDto);
 		report.user = user;
 
