@@ -21,6 +21,11 @@ import { UserDto } from "./dtos/user.dto";
 import { User } from "./user.entity";
 import { UsersService } from "./users.service";
 
+interface Session {
+	userId?: number | null;
+	[key: string]: any;
+}
+
 @Controller("/auth")
 @Serialize(UserDto)
 export class UsersController {
@@ -30,7 +35,7 @@ export class UsersController {
 	) {}
 
 	@Post("/signup")
-	async createUser(@Body() body: CreateUserDto, @Session() session: any) {
+	async createUser(@Body() body: CreateUserDto, @Session() session: Session) {
 		const user = await this.authService.signup(body.email, body.password);
 		session.userId = user.id;
 
@@ -44,12 +49,12 @@ export class UsersController {
 	}
 
 	@Post("/signout")
-	signOut(@Session() session: any) {
+	signOut(@Session() session: Session) {
 		session.userId = null;
 	}
 
 	@Post("/signin")
-	async signin(@Body() body: CreateUserDto, @Session() session: any) {
+	async signin(@Body() body: CreateUserDto, @Session() session: Session) {
 		const user = await this.authService.signin(body.email, body.password);
 		session.userId = user.id;
 
