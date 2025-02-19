@@ -1,4 +1,4 @@
-import { BadRequestException } from "@nestjs/common";
+import { BadRequestException, NotFoundException } from "@nestjs/common";
 import { Test } from "@nestjs/testing";
 import { AuthService } from "./auth.service";
 import { User } from "./user.entity";
@@ -10,10 +10,23 @@ describe("AuthService", () => {
 
 	beforeEach(async () => {
 		// Create fake copy of the users service
+		const users: User[] = [];
+
 		fakeUsersService = {
-			find: () => Promise.resolve([]),
-			create: (email: string, password: string) =>
-				Promise.resolve({ id: 1, email, password } as User),
+			find: (email: string) => {
+				const filteredUsers = users.filter((user) => user.email === email);
+				return Promise.resolve(filteredUsers);
+			},
+			create: (email: string, password: string) => {
+				const user = {
+					id: Math.floor(Math.random() * 999999999),
+					email,
+					password,
+				} as User;
+
+				users.push(user);
+				return Promise.resolve(user);
+			},
 		};
 
 		const module = await Test.createTestingModule({
@@ -38,18 +51,37 @@ describe("AuthService", () => {
 
 		expect(user.password).not.toEqual("12345");
 		const [salt, hash] = user.password.split(".");
+		console.log("salt", salt);
+		console.log("hash", hash);
 		expect(salt).toBeDefined();
 		expect(hash).toBeDefined();
 	});
 
 	it("Throws an error if user signs up with an email that's already in use", async () => {
-		fakeUsersService.find = () =>
-			Promise.resolve([
-				{ id: 1, email: "asd@asd.com", password: "12345" } as User,
-			]);
+		await service.signup("asd@asd.com", "12345");
 
 		await expect(service.signup("asd@asd.com", "12345")).rejects.toThrow(
 			BadRequestException,
 		);
+	});
+
+	it("Throws if email doesn't exist when signing in", async () => {
+		await expect(service.signin("asd@asd.com", "12345")).rejects.toThrow(
+			NotFoundException,
+		);
+	});
+
+	it("Throws if a wrong password is provided", async () => {
+		await service.signup("asd@asd.com", "12345678");
+		await expect(service.signin("asd@asd.com", "123")).rejects.toThrow(
+			BadRequestException,
+		);
+	});
+
+	it("Returns a user if correct password is provided", async () => {
+		await service.signup("asd@asd.com", "12345678");
+		const user = await service.signin("asd@asd.com", "12345678");
+
+		expect(user).toBeDefined();
 	});
 });
