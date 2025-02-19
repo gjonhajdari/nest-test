@@ -12,7 +12,7 @@ import { Serialize } from "../interceptors/serialize.interceptor";
 import { CurrentUser } from "../users/decorators/current-user.decorator";
 import { User } from "../users/user.entity";
 import { ApproveReportDto } from "./dtos/approve-report.dto";
-import { CreateReportDto } from "./dtos/create-reports.dto";
+import { CreateReportDto } from "./dtos/create-report.dto";
 import { ReportDto } from "./dtos/report.dto";
 import { ReportsService } from "./reports.service";
 
