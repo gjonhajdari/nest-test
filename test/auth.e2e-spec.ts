@@ -2,6 +2,7 @@ import { INestApplication } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 import * as request from "supertest";
 import { App } from "supertest/types";
+import { getConnection } from "typeorm";
 import { AppModule } from "./../src/app.module";
 
 describe("Authentication System (e2e)", () => {
@@ -14,6 +15,12 @@ describe("Authentication System (e2e)", () => {
 
 		app = moduleFixture.createNestApplication();
 		await app.init();
+	});
+
+	afterEach(async () => {
+		await app.close();
+		const conn = getConnection();
+		await conn.close();
 	});
 
 	it("handles a signup request", () => {
