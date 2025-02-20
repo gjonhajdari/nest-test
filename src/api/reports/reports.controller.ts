@@ -28,6 +28,11 @@ export class ReportsController {
 		return this.reportsService.createEstimate(query);
 	}
 
+	@Get("/all")
+	getReports() {
+		return this.reportsService.getReports();
+	}
+
 	@Post()
 	@UseGuards(AuthGuard)
 	@Serialize(ReportDto)

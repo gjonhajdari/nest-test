@@ -20,10 +20,15 @@ export class ReportsService {
 			.andWhere("ABS(lng - :lng) <= 5", { lng })
 			.andWhere("year - :year BETWEEN -3 AND 3", { year })
 			.andWhere("approved IS TRUE")
+			.groupBy("mileage")
 			.orderBy("ABS(mileage - :mileage)", "ASC")
 			.setParameters({ mileage })
 			.limit(3)
 			.getRawOne();
+	}
+
+	getReports() {
+		return this.repo.find();
 	}
 
 	createReport(reportDto: CreateReportDto, user: User) {
